@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edumind</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="sprite" aria-hidden="true">
+      <symbol id="icon-brain" viewBox="0 0 24 24">
+        <path d="M9 3a4 4 0 0 0-4 4v.4A4.4 4.4 0 0 0 3 11a4.4 4.4 0 0 0 2 3.6V17a4 4 0 0 0 7 2.6A4 4 0 0 0 19 17v-2.4a4.4 4.4 0 0 0 2-3.6 4.4 4.4 0 0 0-2-3.6V7a4 4 0 0 0-7-2.6A4 4 0 0 0 9 3Z" />
+        <path d="M12 4.4v15.2M8 8.5h2M14 8.5h2M7.5 14H10M14 14h2.5" />
+      </symbol>
+      <symbol id="icon-send" viewBox="0 0 24 24">
+        <path d="m3 11 18-8-8 18-2-8-8-2Z" />
+        <path d="m11 13 10-10" />
+      </symbol>
+      <symbol id="icon-key" viewBox="0 0 24 24">
+        <circle cx="7.5" cy="14.5" r="4.5" />
+        <path d="m11 11 9-9M16 6l2 2M14 8l2 2" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 13 4 4L19 7" />
+      </symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 6v5h-5" />
+        <path d="M4 18v-5h5" />
+        <path d="M18 11a6 6 0 0 0-10-4.5L4 10" />
+        <path d="M6 13a6 6 0 0 0 10 4.5L20 14" />
+      </symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </symbol>
+      <symbol id="icon-book" viewBox="0 0 24 24">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 1 4 17.5v-12Z" />
+        <path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20" />
+      </symbol>
+    </svg>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary">
+        <a class="brand" href="#workspace" aria-label="Edumind home">
+          <span class="brand-mark"><svg><use href="#icon-brain"></use></svg></span>
+          <span>Edumind</span>
+        </a>
+
+        <nav class="nav-list" aria-label="Workspace sections">
+          <a class="nav-link active" href="#workspace">Workspace</a>
+          <a class="nav-link" href="#gemini">Gemini Tutor</a>
+          <a class="nav-link" href="#plan">Study Plan</a>
+          <a class="nav-link" href="#notes">Notes</a>
+        </nav>
+
+        <div class="sidebar-panel">
+          <span class="eyebrow">Today</span>
+          <strong>2 focused blocks</strong>
+          <span>Calculus review and AI-generated recall questions.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Learning workspace</p>
+            <h1>Study with a clear plan and an AI tutor.</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+              <svg><use href="#icon-clock"></use></svg>
+            </button>
+            <a class="button ghost" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
+              <svg aria-hidden="true"><use href="#icon-key"></use></svg>
+              API key
+            </a>
+          </div>
+        </header>
+
+        <section id="workspace" class="hero-band" aria-labelledby="workspace-title">
+          <div class="hero-copy">
+            <p class="eyebrow">Edumind dashboard</p>
+            <h2 id="workspace-title">One place for goals, concepts, recall, and Gemini-powered help.</h2>
+            <p>Track what matters, generate focused prompts, and keep the next study action visible.</p>
+            <div class="hero-actions">
+              <button class="button primary" id="quickStart" type="button">
+                <svg aria-hidden="true"><use href="#icon-check"></use></svg>
+                Start focus block
+              </button>
+              <button class="button secondary" id="samplePrompt" type="button">
+                <svg aria-hidden="true"><use href="#icon-send"></use></svg>
+                Fill tutor prompt
+              </button>
+            </div>
+          </div>
+          <div class="study-visual" aria-label="Study progress preview">
+            <div class="orbit-card main-card">
+              <span>Mastery</span>
+              <strong id="masteryScore">74%</strong>
+              <div class="progress-track"><span style="width: 74%"></span></div>
+            </div>
+            <div class="orbit-card mini-card one">
+              <span>Recall</span>
+              <strong>18</strong>
+            </div>
+            <div class="orbit-card mini-card two">
+              <span>Focus</span>
+              <strong>45m</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Learning summary">
+          <article class="stat-card">
+            <span class="eyebrow">Next class</span>
+            <strong>Data Structures</strong>
+            <p>Binary trees and traversal strategy</p>
+          </article>
+          <article class="stat-card">
+            <span class="eyebrow">Due soon</span>
+            <strong>3 tasks</strong>
+            <p>Sorted by effort and deadline</p>
+          </article>
+          <article class="stat-card">
+            <span class="eyebrow">Weak topic</span>
+            <strong>Proofs</strong>
+            <p>Needs active recall tonight</p>
+          </article>
+        </section>
+
+        <div class="content-grid">
+          <section id="gemini" class="panel ai-panel" aria-labelledby="gemini-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Gemini free tier</p>
+                <h2 id="gemini-title">Tutor prompt</h2>
+              </div>
+              <span class="status-pill" id="keyStatus">No key saved</span>
+            </div>
+
+            <form id="geminiForm" class="gemini-form">
+              <div class="form-row">
+                <label for="apiKey">Gemini API key</label>
+                <div class="input-action">
+                  <input id="apiKey" name="apiKey" type="password" autocomplete="off" placeholder="Paste key from Google AI Studio" />
+                  <button class="button ghost small" id="saveKey" type="button">Save</button>
+                </div>
+                <p class="field-hint">Stored only in this browser when saved.</p>
+              </div>
+
+              <div class="form-pair">
+                <div class="form-row">
+                  <label for="modelSelect">Model</label>
+                  <select id="modelSelect" name="modelSelect">
+                    <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                    <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label for="studyMode">Mode</label>
+                  <select id="studyMode" name="studyMode">
+                    <option value="Explain like a tutor, then ask two recall questions.">Tutor</option>
+                    <option value="Create a compact study plan with timed steps.">Plan</option>
+                    <option value="Quiz me with five questions and answer key.">Quiz</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label for="topicInput">Topic</label>
+                <input id="topicInput" name="topicInput" type="text" value="Binary tree traversal" />
+              </div>
+
+              <div class="form-row">
+                <label for="promptInput">Request</label>
+                <textarea id="promptInput" name="promptInput" rows="6">Explain inorder, preorder, and postorder traversal using one small example. Then ask me two recall questions.</textarea>
+              </div>
+
+              <div class="form-actions">
+                <button class="button primary" id="askGemini" type="submit">
+                  <svg aria-hidden="true"><use href="#icon-send"></use></svg>
+                  Ask Gemini
+                </button>
+                <button class="button ghost" id="clearOutput" type="button">Clear</button>
+              </div>
+              <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+            </form>
+
+            <article class="response-box" aria-labelledby="response-title">
+              <div class="response-header">
+                <h3 id="response-title">Tutor response</h3>
+                <button class="icon-button" id="copyResponse" type="button" aria-label="Copy tutor response" title="Copy response">
+                  <svg><use href="#icon-book"></use></svg>
+                </button>
+              </div>
+              <div id="responseOutput" class="response-output">Gemini output will appear here.</div>
+            </article>
+          </section>
+
+          <section id="plan" class="panel" aria-labelledby="plan-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Study plan</p>
+                <h2 id="plan-title">Next actions</h2>
+              </div>
+              <button class="icon-button" id="regeneratePlan" type="button" aria-label="Regenerate study plan" title="Regenerate plan">
+                <svg><use href="#icon-refresh"></use></svg>
+              </button>
+            </div>
+            <ol class="task-list" id="taskList"></ol>
+          </section>
+
+          <section id="notes" class="panel notes-panel" aria-labelledby="notes-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Notes</p>
+                <h2 id="notes-title">Capture</h2>
+              </div>
+              <span class="status-pill" id="noteStatus">Saved</span>
+            </div>
+            <label class="sr-only" for="noteInput">Study notes</label>
+            <textarea id="noteInput" rows="11">Binary tree traversal:
+- Inorder: left, root, right
+- Preorder: root, left, right
+- Postorder: left, right, root</textarea>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
