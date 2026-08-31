@@ -6,7 +6,7 @@ const path = require("node:path");
 const root = __dirname;
 const port = Number(process.env.PORT || 4174);
 const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript" };
-const allowedModels = new Set(["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]);
+const allowedModels = new Set(["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]);
 
 loadEnv();
 
@@ -54,6 +54,12 @@ async function gemini(req, res) {
   const model = allowedModels.has(body.model) ? body.model : "gemini-3.6-flash";
   const prompt = String(body.prompt || "").trim();
   if (!prompt) return json(res, 400, { error: "Prompt is required" });
+  const parts = [{ text: prompt }];
+  if (body.image?.data) {
+    const mimeType = String(body.image.mimeType || "image/jpeg");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType)) return json(res, 400, { error: "Unsupported image type" });
+    parts.push({ inlineData: { mimeType, data: String(body.image.data) } });
+  }
 
   let response;
   try {
@@ -61,7 +67,7 @@ async function gemini(req, res) {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [{ role: "user", parts }],
         generationConfig: { temperature: 0.55, maxOutputTokens: 900 },
       }),
     });
@@ -89,7 +95,10 @@ function readJson(req) {
     let body = "";
     req.on("data", (chunk) => {
       body += chunk;
-      if (body.length > 20000) req.destroy();
+      if (body.length > 8000000) {
+        reject(new Error("Request body too large"));
+        req.destroy();
+      }
     });
     req.on("end", () => {
       try { resolve(JSON.parse(body || "{}")); } catch { reject(new Error("Invalid JSON")); }

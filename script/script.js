@@ -84,6 +84,19 @@ const roles = {
   },
 };
 
+const studentOverview = {
+  stats: [
+    ["Mastery", "78%", "Algebra and graph reading are trending up.", "icon-target"],
+    ["Study streak", "12 days", "Consistent short sessions this month.", "icon-clock"],
+    ["Due today", "3 tasks", "A focused workload, not a long queue.", "icon-check"],
+  ],
+  pathway: [
+    ["Linear equations", "Warm-up", "10 min", 86, "Solve two one-step equations and explain the inverse operation."],
+    ["Graph intercepts", "Core gap", "18 min", 64, "Read x- and y-intercepts from a graph before writing the equation."],
+    ["Word problems", "Stretch", "15 min", 52, "Translate one sentence into an equation before calculating."],
+  ],
+};
+
 const icon = (id) => `<svg aria-hidden="true"><use href="#${id}"></use></svg>`;
 const route = () => location.hash.replace(/^#\/?/, "") || "login";
 const setRoute = (path) => { location.hash = path; };
@@ -232,6 +245,7 @@ function panel(section) {
 }
 
 function renderDashboard(roleId = currentRole()) {
+  if (roleId === "student") return renderStudentDashboard();
   const role = roles[roleId];
   localStorage.setItem(storage.role, roleId);
   app.innerHTML = `
@@ -258,6 +272,162 @@ function renderDashboard(roleId = currentRole()) {
     </div>
   `;
   wireDashboard(roleId);
+}
+
+function renderStudentDashboard() {
+  localStorage.setItem(storage.role, "student");
+  app.innerHTML = `
+    <div class="student-shell">
+      <aside class="student-sidebar" aria-label="Student navigation">
+        <a class="student-brand" href="#/login/student">
+          <span class="student-brand-mark">${icon("icon-eye-logo")}</span>
+          <span><strong>EduMind</strong><small>Student route</small></span>
+        </a>
+        <nav class="student-nav" aria-label="Student dashboard sections">
+          <a class="active" href="#/student">${icon("icon-home")} Dashboard</a>
+          <a href="#/student" data-scroll="ai-assistant">${icon("icon-brain")} AI Tutor</a>
+          <a href="#/student" data-scroll="camera-ocr">${icon("icon-camera")} OCR Scan</a>
+          <a href="#/student" data-scroll="review-pathway">${icon("icon-target")} Review Path</a>
+        </nav>
+        <button class="logout-button student-logout" id="logoutButton" type="button">${icon("icon-log-out")} Login screen</button>
+      </aside>
+
+      <main class="student-main" id="main-content">
+        <div class="student-mobile-top">
+          <a class="student-brand" href="#/login/student">
+            <span class="student-brand-mark">${icon("icon-eye-logo")}</span>
+            <span><strong>EduMind</strong><small>Student</small></span>
+          </a>
+          <span class="student-language-pill"><span class="flag flag-en" aria-hidden="true"></span> EN</span>
+        </div>
+
+        <header class="student-hero" aria-labelledby="student-title">
+          <div>
+            <p class="eyebrow">Good evening, Linh</p>
+            <h1 id="student-title">Student Dashboard</h1>
+            <p>Gemini guides your next step, checks scanned work, and recommends the right review workload for today.</p>
+          </div>
+          <div class="student-hero-actions">
+            <button class="button primary" id="openAiSection" type="button">${icon("icon-brain")} Ask tutor</button>
+            <button class="button ghost" id="openCameraSection" type="button">${icon("icon-camera")} Scan work</button>
+          </div>
+        </header>
+
+        <section class="student-stats" aria-label="Student progress summary">
+          ${studentOverview.stats.map(([label, value, copy, glyph]) => `
+            <article class="student-stat-card">
+              <span class="student-card-icon">${icon(glyph)}</span>
+              <p>${label}</p>
+              <strong>${value}</strong>
+              <span>${copy}</span>
+            </article>
+          `).join("")}
+        </section>
+
+        <div class="student-dashboard-grid">
+          <section class="student-panel student-tutor" id="ai-assistant" aria-labelledby="ai-title">
+            <div class="student-panel-head">
+              <div>
+                <p class="eyebrow">24/7 Socratic AI Tutor</p>
+                <h2 id="ai-title">Think with Gemini, do not copy from it.</h2>
+              </div>
+              <span class="pill" id="keyStatus">${config.hasGeminiKey ? "Gemini ready" : "Missing key"}</span>
+            </div>
+            <div class="student-tutor-prompt">
+              <span class="student-card-icon">${icon("icon-spark")}</span>
+              <p>Before solving, what operation would isolate the variable, and why does that operation preserve equality?</p>
+            </div>
+            <form class="ai-form student-ai-form" id="aiForm">
+              <label for="prompt">Ask the tutor</label>
+              <textarea id="prompt">Guide me through solving 2x + 7 = 19 using Socratic questions. Do not give the final answer immediately.</textarea>
+              <label class="sr-only" for="model">Model</label>
+              <select class="student-model-select" id="model" aria-label="Gemini model">
+                <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
+                <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option>
+                <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+                <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+              </select>
+              <div class="chat-form-actions">
+                <button class="button primary" id="askGemini" type="submit">${icon("icon-send")} Ask next question</button>
+                <button class="button ghost" id="fillPrompt" type="button">${icon("icon-check")} Demo prompt</button>
+              </div>
+              <p class="form-message" id="aiMessage" role="status" aria-live="polite"></p>
+            </form>
+            <article class="student-response" aria-labelledby="response-title">
+              <div class="response-head">
+                <h3 id="response-title">Gemini tutor response</h3>
+                <span class="pill">Live</span>
+              </div>
+              <div class="response-output" id="responseOutput">The tutor will answer with guided questions after a real backend Gemini request.</div>
+            </article>
+          </section>
+
+          <section class="student-panel student-camera" id="camera-ocr" aria-labelledby="camera-title">
+            <div class="student-panel-head">
+              <div>
+                <p class="eyebrow">OCR scanning and grading</p>
+                <h2 id="camera-title">Capture a worksheet with the device camera.</h2>
+              </div>
+              <span class="pill">Camera</span>
+            </div>
+            <div class="student-camera-grid">
+              <div class="camera-preview student-camera-preview">
+                <video id="cameraVideo" playsinline autoplay muted></video>
+                <canvas id="cameraCanvas" hidden></canvas>
+                <div class="camera-placeholder" aria-hidden="true">${icon("icon-camera")} Point camera at written work</div>
+              </div>
+              <div class="student-camera-actions">
+                <button class="button primary" id="startCamera" type="button">${icon("icon-camera")} Start camera</button>
+                <button class="button ghost" id="captureFrame" type="button">${icon("icon-check")} Grade scan</button>
+                <button class="button ghost" id="stopCamera" type="button">${icon("icon-log-out")} Stop</button>
+              </div>
+            </div>
+            <p class="form-message" id="cameraMessage" role="status" aria-live="polite"></p>
+            <article class="student-ocr-result" aria-labelledby="ocr-title">
+              <span>84%</span>
+              <div>
+                <h3 id="ocr-title">OCR demo response</h3>
+                <p id="ocrOutput">Start the camera and capture a frame. If Gemini is configured, the captured image is sent to the local backend for OCR-style feedback.</p>
+              </div>
+            </article>
+          </section>
+
+          <section class="student-panel student-review" id="review-pathway" aria-labelledby="review-title">
+            <div class="student-panel-head">
+              <div>
+                <p class="eyebrow">Personalized Review Pathway</p>
+                <h2 id="review-title">Recommended for the next 43 minutes.</h2>
+              </div>
+              <span class="pill">Gemini planned</span>
+            </div>
+            <ol class="student-path-list">
+              ${studentOverview.pathway.map(([name, tag, time, score, copy]) => `
+                <li>
+                  <div>
+                    <strong>${name}</strong>
+                    <p>${copy}</p>
+                  </div>
+                  <span>${tag}</span>
+                  <small>${time}</small>
+                  <div class="progress-track" aria-label="${name} readiness ${score} percent"><i style="width:${score}%"></i></div>
+                </li>
+              `).join("")}
+            </ol>
+          </section>
+
+        </div>
+
+        <nav class="student-bottom-nav" aria-label="Student mobile navigation">
+          <a class="active" href="#/student">${icon("icon-home")}<span>Home</span></a>
+          <a href="#/student" data-scroll="ai-assistant">${icon("icon-brain")}<span>Tutor</span></a>
+          <a href="#/student" data-scroll="camera-ocr">${icon("icon-camera")}<span>Scan</span></a>
+          <a href="#/student" data-scroll="review-pathway">${icon("icon-target")}<span>Review</span></a>
+        </nav>
+      </main>
+    </div>
+  `;
+  wireDashboard("student");
 }
 
 function renderCameraCard(roleId) {
@@ -295,7 +465,7 @@ function renderAiCard(roleId) {
         <div class="ai-toolbar"><div><p class="eyebrow">Backend Gemini key</p><h2 id="ai-title">Local AI proxy</h2></div><span class="pill" id="keyStatus">${config.hasGeminiKey ? "Gemini ready" : "Missing key"}</span></div>
         <form class="ai-form" id="aiForm">
           <div class="form-grid">
-            <div class="form-field"><label for="model">Model</label><select id="model"><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.5-flash">Gemini 3.5 Flash</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option></select></div>
+            <div class="form-field"><label for="model">Model</label><select id="model"><option value="gemini-3.6-flash">Gemini 3.6 Flash</option><option value="gemini-3.5-flash">Gemini 3.5 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option><option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option><option value="gemini-3.7-flash">Gemini 3.7 Flash</option></select></div>
             <div class="form-field"><label for="audience">Route context</label><input id="audience" value="${role.label}" readonly /></div>
           </div>
           <div class="form-field"><label for="prompt">Prompt</label><textarea id="prompt">${role.aiMode} Topic: ${defaultTopic(roleId)}</textarea></div>
@@ -321,8 +491,9 @@ function show(element, text, type = "") {
 
 function setAiLoading(loading) {
   const button = document.querySelector("#askGemini");
+  const label = currentRole() === "student" ? "Ask next question" : "Ask Gemini";
   button.disabled = loading;
-  button.innerHTML = loading ? "Thinking..." : `${icon("icon-send")} Ask Gemini`;
+  button.innerHTML = loading ? "Thinking..." : `${icon("icon-send")} ${label}`;
 }
 
 function wireDashboard(roleId) {
@@ -334,6 +505,13 @@ function wireDashboard(roleId) {
   document.querySelector("#openCameraSection").addEventListener("click", () => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.querySelector("#camera-ocr").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  });
+  document.querySelectorAll("[data-scroll]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.getElementById(link.dataset.scroll)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    });
   });
   document.querySelector("#startCamera").addEventListener("click", startCamera);
   document.querySelector("#captureFrame").addEventListener("click", captureFrame);
@@ -379,13 +557,14 @@ async function startCamera() {
     stopCamera(false);
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
     video.srcObject = cameraStream;
+    video.classList.add("is-live");
     show(message, "Camera is live. Point it at a worksheet and capture.", "success");
   } catch (error) {
     show(message, error.message || "Camera permission was blocked.", "error");
   }
 }
 
-function captureFrame() {
+async function captureFrame() {
   const video = document.querySelector("#cameraVideo");
   const canvas = document.querySelector("#cameraCanvas");
   const output = document.querySelector("#ocrOutput");
@@ -394,19 +573,51 @@ function captureFrame() {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext("2d").drawImage(video, 0, 0);
-  output.textContent = [
+  const demoText = [
     "Detected worksheet: Math assignment photo",
     "Extracted text: Solve x^2 - 5x + 6 = 0 and explain each step.",
     "Demo feedback: The solution likely factors into (x - 2)(x - 3). Check whether the student wrote both roots and justified the factorization.",
   ].join("\n");
-  show(message, "Frame captured and OCR demo response generated.", "success");
+
+  if (!config.hasGeminiKey) {
+    output.textContent = demoText;
+    return show(message, "Frame captured. Add GEMINI_API_KEY for live image feedback.", "success");
+  }
+
+  show(message, "Frame captured. Sending image to Gemini for OCR-style grading...");
+  output.textContent = "Analyzing captured worksheet image...";
+  try {
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: document.querySelector("#model")?.value || "gemini-3.6-flash",
+        prompt: "You are EduMind OCR grading support. Read this worksheet photo, extract any visible math work, grade it briefly, and give Socratic next-step feedback. If the photo is unclear, say what to retake.",
+        image: {
+          mimeType: "image/jpeg",
+          data: dataUrl.split(",")[1],
+        },
+      }),
+    });
+    const data = await readResponseBody(response);
+    if (!response.ok) throw new Error(data.error || "Gemini image request failed.");
+    output.textContent = data.text || demoText;
+    show(message, "Gemini OCR-style feedback ready.", "success");
+  } catch (error) {
+    output.textContent = `${demoText}\n\nLive Gemini image feedback failed: ${error.message}`;
+    show(message, "Using demo OCR feedback because Gemini image analysis failed.", "error");
+  }
 }
 
 function stopCamera(clearMessage = true) {
   if (cameraStream) cameraStream.getTracks().forEach((track) => track.stop());
   cameraStream = null;
   const video = document.querySelector("#cameraVideo");
-  if (video) video.srcObject = null;
+  if (video) {
+    video.srcObject = null;
+    video.classList.remove("is-live");
+  }
   if (clearMessage) show(document.querySelector("#cameraMessage"), "Camera stopped.");
 }
 
