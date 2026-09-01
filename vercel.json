@@ -1,12 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "routes": [
-    { "src": "/api/gemini", "dest": "/api/gemini.js" },
-    { "src": "/api/config", "dest": "/api/config.js" },
-    { "src": "/config", "dest": "/api/config.js" },
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
-  ]
+  "outputDirectory": "dist"
 }

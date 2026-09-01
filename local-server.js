@@ -12,9 +12,8 @@ loadEnv();
 
 http.createServer(async (req, res) => {
   try {
-    if (req.method === "OPTIONS") return cors(res, 204);
     const url = new URL(req.url, `http://${req.headers.host}`);
-    if (req.method === "GET" && url.pathname === "/config") return json(res, 200, {
+    if (req.method === "GET" && url.pathname === "/api/config") return json(res, 200, {
       hasGeminiKey: Boolean(process.env.GEMINI_API_KEY),
     });
     if (req.method === "POST" && url.pathname === "/api/gemini") return gemini(req, res);
@@ -72,20 +71,6 @@ function readJson(req) {
 }
 
 function json(res, status, body) {
-  res.writeHead(status, {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  });
+  res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
-}
-
-function cors(res, status) {
-  res.writeHead(status, {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  });
-  res.end();
 }

@@ -5,9 +5,6 @@ let config = { hasGeminiKey: false };
 let cameraStream = null;
 let loginLang = "en";
 
-const apiBase = localStorage.getItem("edumind.apiBase") || "";
-const apiUrl = (path) => `${apiBase}${path}`;
-
 const loginText = {
   en: {
     title: "EduMind AI",
@@ -416,7 +413,7 @@ const currentRole = () => {
 
 async function initBackend() {
   try {
-    config = await fetch(apiUrl("/config")).then((response) => response.json());
+    config = await fetch("/api/config").then((response) => response.json());
   } catch {
     config = { hasGeminiKey: false };
   }
@@ -1244,7 +1241,7 @@ async function askParentAdvisor(event) {
   button.innerHTML = loginLang === "vi" ? "Đang nghĩ..." : "Thinking...";
   show(message, loginLang === "vi" ? "Đang gửi tới Gemini..." : "Sending to Gemini...");
   try {
-    const response = await fetch(apiUrl("/api/gemini"), {
+    const response = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1278,7 +1275,7 @@ async function askTeacherChat(event) {
   button.innerHTML = "Thinking...";
   show(message, "Sending to Gemini...");
   try {
-    const response = await fetch(apiUrl("/api/gemini"), {
+    const response = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1309,7 +1306,7 @@ async function askGemini(event) {
   show(message, "Sending request to local Gemini backend...");
   output.textContent = "";
   try {
-    const response = await fetch(apiUrl("/api/gemini"), {
+    const response = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: document.querySelector("#model").value, prompt }),
@@ -1372,7 +1369,7 @@ async function captureFrame() {
   output.textContent = "Analyzing captured worksheet image...";
   try {
     const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
-    const response = await fetch(apiUrl("/api/gemini"), {
+    const response = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
