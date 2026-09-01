@@ -129,7 +129,7 @@ Vercel provides HTTPS automatically.
 Commit the app and Vercel backend files:
 
 ```powershell
-git add .gitignore README.md index.html css/styles.css script/script.js local-server.js api package.json vercel.json
+git add .gitignore README.md index.html css/styles.css script/script.js local-server.js api package.json vercel.json scripts
 git commit -m "Prepare EduMind for Vercel deployment"
 git push origin $(git branch --show-current)
 ```
@@ -153,4 +153,5 @@ node --check local-server.js
 node --check api/gemini.js
 node --check api/config.js
 node --check api/gemini-core.js
+npm run build
 ```
