@@ -26,7 +26,7 @@ The project deliberately uses a small stack: semantic HTML, responsive CSS, vani
 
 | Role | Core experiences |
 | --- | --- |
-| **Student** | 24/7 Socratic AI tutor, live camera worksheet capture, OCR-style grading, personalized review pathway |
+| **Student** | 24/7 Socratic AI tutor, live camera worksheet capture, OCR-style grading, personalized review pathway, MathVision-style practice studio |
 | **Teacher** | Handwritten assignment feedback, differentiated exam matrix generator, competency reports, floating AI assistant |
 | **Parent** | Weekly learning digest, emotional support plan, grade report, practical Gemini parent advisor |
 
@@ -40,6 +40,7 @@ Every dashboard supports English and Vietnamese, including British and Vietnames
 - The camera uses the real device camera through `getUserMedia`.
 - Captured worksheet images can be sent to Gemini for multimodal OCR-style analysis and feedback.
 - A demo review pathway shows how learning gaps can become manageable next-step exercises.
+- The MathVision-style studio adds AI gap diagnostics, a math mind map, AI question generation, online exams, math arena, leaderboard, flashcards, math tools, a resource library, FAQ, and a locked teacher-room demo.
 
 ### Teacher workspace
 
@@ -70,8 +71,7 @@ The browser never receives `GEMINI_API_KEY`. It only sends prompts or captured i
 
 Security details:
 
-- `.env`, `.env.*`, and `.vercel/` are excluded from Git.
-- `.env.example` contains only a safe placeholder.
+- `.env*` and `.vercel/` are excluded from Git.
 - The Gemini key is sent to Google in the `x-goog-api-key` request header, not in browser code or a request URL.
 - The production API is same-origin; wildcard CORS is not enabled.
 - Git history and tracked files are checked for key-shaped values before release.
@@ -85,17 +85,15 @@ EduMind
 |-- index.html                 # App shell and reusable SVG icon sprite
 |-- css/
 |   `-- styles.css             # Responsive visual system for all roles
-|-- script/
-|   `-- script.js              # Routing, UI state, camera, and API calls
+|-- scripts/
+|   |-- script.js              # Routing, UI state, camera, and API calls
+|   `-- build-vercel.js        # Copies static assets into dist/
 |-- api/
 |   |-- config.js              # Reports whether the server key is configured
 |   |-- gemini.js              # Vercel serverless API endpoint
 |   `-- gemini-core.js         # Shared Gemini request logic
-|-- scripts/
-|   `-- build-vercel.js        # Copies static assets into dist/
 |-- local-server.js            # Dependency-free local development server
-|-- vercel.json                # Vercel build and output configuration
-`-- .env.example               # Safe local environment template
+`-- vercel.json                # Vercel build and output configuration
 ```
 
 ## Demo Routes
@@ -115,25 +113,19 @@ The login is demo-only. Enter any non-empty email and password to continue.
 
 Requirements: Node.js 18 or newer and a Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-1. Create `.env` in the project root from the safe template:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-2. Replace the placeholder inside `.env`:
+1. Create `.env` in the project root if you want local Gemini calls:
 
    ```env
    GEMINI_API_KEY=your_real_key_here
    ```
 
-3. Start the dependency-free local server:
+2. Start the dependency-free local server:
 
    ```powershell
    npm start
    ```
 
-4. Open [http://127.0.0.1:4174](http://127.0.0.1:4174).
+3. Open [http://127.0.0.1:4174](http://127.0.0.1:4174).
 
 No `npm install` step is required because the project has no external runtime dependencies.
 
@@ -152,13 +144,13 @@ GET  /api/config
 POST /api/gemini
 ```
 
-Never put the key in `script/script.js`, `index.html`, `vercel.json`, or any variable whose value is exposed to the browser.
+Never put the key in `scripts/script.js`, `index.html`, `vercel.json`, or any variable whose value is exposed to the browser.
 
 ## Judge Walkthrough
 
 1. Choose Student, Teacher, or Parent on the login screen and enter any demo credentials.
 2. Switch between English and Vietnamese using the flag control.
-3. On Student, ask the Socratic tutor a question and allow camera access to test worksheet capture.
+3. On Student, review the MathVision-style feature studio, ask the Socratic tutor a question, and allow camera access to test worksheet capture.
 4. On Teacher, generate an exam, inspect the blurred-background modal, and open the floating assistant.
 5. On Parent, review the weekly digest, emotional support plan, grade report, and AI advisor.
 6. Resize the browser or use a phone to inspect the responsive navigation and layouts.

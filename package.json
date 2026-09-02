@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-vercel.js",
-    "check": "node --check script/script.js && node --check local-server.js && node --check api/gemini.js && node --check api/config.js && node --check api/gemini-core.js && npm run build",
+    "check": "node --check scripts/script.js && node --check local-server.js && node --check api/gemini.js && node --check api/config.js && node --check api/gemini-core.js && npm run build",
     "dev": "node local-server.js",
     "start": "node local-server.js"
   }

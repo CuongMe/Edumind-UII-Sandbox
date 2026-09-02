@@ -2577,3 +2577,170 @@ textarea:hover {
     width: 100%;
   }
 }
+
+.feature-hub {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 1184px;
+  margin: 0 auto 14px;
+}
+
+.feature-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid rgba(6, 214, 160, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+}
+
+.feature-card h2 {
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.feature-card p {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.feature-card .feature-action {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 42px;
+}
+
+.math-studio {
+  grid-column: 1 / -1;
+}
+
+.mindmap {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.mindmap span {
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-weight: 900;
+  text-align: center;
+}
+
+.mindmap i {
+  display: none;
+}
+
+.practice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.practice-grid article {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.practice-grid p,
+.practice-grid li {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.practice-grid b {
+  display: inline-flex;
+  margin-top: 10px;
+  color: #047857;
+}
+
+.flashcard {
+  display: grid;
+  gap: 8px;
+}
+
+.flashcard p {
+  min-height: 42px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #047857;
+  font-weight: 800;
+}
+
+.resource-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.resource-strip span,
+.calculator-output {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-weight: 900;
+}
+
+.calculator-modal input {
+  font-family: "DM Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.calculator-output {
+  justify-content: center;
+  min-height: 64px;
+  border-radius: 14px;
+  font-size: 1.6rem;
+}
+
+@media (max-width: 1040px) {
+  .feature-hub,
+  .practice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 760px;
+  }
+
+  .mindmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .feature-hub,
+  .practice-grid,
+  .mindmap {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-hub {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .feature-card {
+    border-radius: 14px;
+  }
+}
