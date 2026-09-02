@@ -56,19 +56,6 @@ Every dashboard supports English and Vietnamese, including British and Vietnames
 - The grade report combines scores, movement, and subject-level context.
 - The parent advisor explains learning data without blame or unnecessary jargon.
 
-## How the AI Key Stays Hidden
-
-```mermaid
-flowchart LR
-    A[Browser: HTML, CSS, JavaScript] -->|Same-origin request| B[Vercel Function: /api/gemini]
-    C[Vercel encrypted environment variable] -->|GEMINI_API_KEY| B
-    B -->|Server-side x-goog-api-key header| D[Google Gemini API]
-    D -->|Generated answer only| B
-    B -->|JSON response| A
-```
-
-The browser never receives `GEMINI_API_KEY`. It only sends prompts or captured image data to `/api/gemini`. The serverless function reads the secret from `process.env`, calls Google, and returns the generated text.
-
 Security details:
 
 - `.env*` and `.vercel/` are excluded from Git.
@@ -146,14 +133,6 @@ POST /api/gemini
 
 Never put the key in `scripts/script.js`, `index.html`, `vercel.json`, or any variable whose value is exposed to the browser.
 
-## Judge Walkthrough
-
-1. Choose Student, Teacher, or Parent on the login screen and enter any demo credentials.
-2. Switch between English and Vietnamese using the flag control.
-3. On Student, review the MathVision-style feature studio, ask the Socratic tutor a question, and allow camera access to test worksheet capture.
-4. On Teacher, generate an exam, inspect the blurred-background modal, and open the floating assistant.
-5. On Parent, review the weekly digest, emotional support plan, grade report, and AI advisor.
-6. Resize the browser or use a phone to inspect the responsive navigation and layouts.
 
 ## Verification
 
