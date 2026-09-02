@@ -12,6 +12,8 @@ const roles = {
   parent: { icon: "icon-parent", color: "#a855f7", en: "Parent", vi: "Phụ huynh" },
 };
 
+const icon = (id) => `<svg aria-hidden="true"><use href="#${id}"></use></svg>`;
+
 const i18n = {
   en: {
     login: {
