@@ -1,10 +1,17 @@
 const app = document.querySelector("#app");
 
-const storage = { role: "edumind.role", lang: "edumind.lang" };
+const storage = {
+  role: "edumind.role",
+  lang: "edumind.lang",
+  theme: "edumind.theme",
+  sound: "edumind.sound",
+};
 let config = { hasGeminiKey: false };
 let cameraStream = null;
 let loginLang = localStorage.getItem(storage.lang) || "vi";
 let flashcardIndex = 0;
+let appTheme = localStorage.getItem(storage.theme) || "light";
+let soundOn = localStorage.getItem(storage.sound) !== "off";
 
 const roles = {
   student: { icon: "icon-user", color: "#00b4d8", en: "Student", vi: "Học sinh" },
@@ -432,6 +439,7 @@ const currentRole = () => {
 };
 
 async function initBackend() {
+  document.documentElement.dataset.theme = appTheme;
   try {
     config = await fetch("/api/config").then((response) => response.json());
   } catch {
@@ -459,6 +467,84 @@ function wireLanguage(refresh) {
       localStorage.setItem(storage.lang, loginLang);
       refresh();
     });
+  });
+}
+
+function utilityActions(role) {
+  const calculatorLabel = loginLang === "vi" ? "Máy Tính Casio" : "Casio calculator";
+  const diagnosticLabel = loginLang === "vi" ? "Chẩn Đoán AI" : "AI diagnostic";
+  const themeLabel = appTheme === "dark"
+    ? (loginLang === "vi" ? "Giao diện sáng" : "Light mode")
+    : (loginLang === "vi" ? "Giao diện tối" : "Dark mode");
+  const soundLabel = soundOn
+    ? (loginLang === "vi" ? "Tắt âm thanh" : "Mute sound")
+    : (loginLang === "vi" ? "Bật âm thanh" : "Enable sound");
+  return html`
+    <div class="mathvision-actions">
+      ${role === "student" ? html`
+        <button class="mathvision-action text-action" type="button" data-action="calculator" title="${calculatorLabel}">
+          ${icon("icon-calculator")}<span>${calculatorLabel}</span>
+        </button>
+        <button class="mathvision-action text-action" type="button" data-scroll="diagnostic" title="${diagnosticLabel}">
+          ${icon("icon-target")}<span>${diagnosticLabel}</span>
+        </button>
+      ` : ""}
+      <button class="mathvision-action icon-action" type="button" data-action="theme" title="${themeLabel}" aria-label="${themeLabel}">
+        ${icon(appTheme === "dark" ? "icon-sun" : "icon-moon")}
+      </button>
+      <button class="mathvision-action icon-action" type="button" data-action="sound" title="${soundLabel}" aria-label="${soundLabel}">
+        ${icon(soundOn ? "icon-volume" : "icon-volume-off")}
+      </button>
+      ${languageSwitch("topbar-language-switch")}
+    </div>
+  `;
+}
+
+function groupedNav(role, nav) {
+  if (role !== "student") {
+    return nav.map(([id, glyph, label], index) => html`
+      <a class="${index === 0 ? "active" : ""}" href="#/${role}" data-scroll="${id}">${icon(glyph)} ${label}</a>
+    `).join("");
+  }
+  const groups = loginLang === "vi"
+    ? [
+      ["Học Tập AI", [["diagnostic", "icon-target", "Chẩn Đoán Lỗ Hổng"], ["mindmap", "icon-chart", "Sơ Đồ Tư Duy Toán"], ["ai-assistant", "icon-brain", "Trợ Lý AI Tutor"], ["generator", "icon-spark", "AI Tạo Câu Hỏi"]]],
+      ["Kiểm Tra & Ôn Luyện", [["exams", "icon-book", "Làm Bài Trực Tuyến"], ["arena", "icon-target", "Đấu Trường Toán Học"], ["leaderboard", "icon-chart", "Bảng Xếp Hạng"], ["flashcards", "icon-book", "Thẻ Ghi Nhớ"]]],
+      ["Công Cụ & Tài Liệu", [["math-tools", "icon-key", "Công Cụ Toán Học"], ["resources", "icon-book", "Kho Tài Liệu"], ["guide", "icon-check", "Hướng Dẫn & FAQ"], ["admin", "icon-key", "Phòng Giáo Viên"]]],
+    ]
+    : [
+      ["AI Learning", [["diagnostic", "icon-target", "Gap Diagnostic"], ["mindmap", "icon-chart", "Math Mind Map"], ["ai-assistant", "icon-brain", "AI Tutor"], ["generator", "icon-spark", "Question Generator"]]],
+      ["Testing & Practice", [["exams", "icon-book", "Online Exams"], ["arena", "icon-target", "Math Arena"], ["leaderboard", "icon-chart", "Leaderboard"], ["flashcards", "icon-book", "Flashcards"]]],
+      ["Tools & Resources", [["math-tools", "icon-key", "Math Tools"], ["resources", "icon-book", "Resources"], ["guide", "icon-check", "Guide & FAQ"], ["admin", "icon-key", "Teacher Room"]]],
+    ];
+  return groups.map(([label, links]) => html`
+    <div class="mathvision-nav-group">
+      <button type="button">${label}${icon("icon-chevron-down")}</button>
+      <div class="mathvision-nav-menu">
+        ${links.map(([id, glyph, itemLabel]) => html`<a href="#/student" data-scroll="${id}">${icon(glyph)}<span>${itemLabel}</span></a>`).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function wireUtilities(refresh) {
+  document.querySelectorAll("[data-action='theme']").forEach((button) => {
+    button.addEventListener("click", () => {
+      appTheme = appTheme === "dark" ? "light" : "dark";
+      localStorage.setItem(storage.theme, appTheme);
+      document.documentElement.dataset.theme = appTheme;
+      refresh();
+    });
+  });
+  document.querySelectorAll("[data-action='sound']").forEach((button) => {
+    button.addEventListener("click", () => {
+      soundOn = !soundOn;
+      localStorage.setItem(storage.sound, soundOn ? "on" : "off");
+      refresh();
+    });
+  });
+  document.querySelectorAll("[data-action='calculator']").forEach((button) => {
+    button.addEventListener("click", openCalculator);
   });
 }
 
@@ -522,17 +608,19 @@ function renderLogin(role = currentRole()) {
 function shell(role, nav) {
   const page = t(role);
   return html`
-    <div class="${role}-shell app-shell">
-      ${languageSwitch("dashboard-language-switch")}
+    <div class="${role}-shell app-shell mathvision-shell">
       <aside class="${role}-sidebar student-sidebar" aria-label="${roleLabel(role)} navigation">
         <a class="student-brand ${role}-brand" href="#/login/${role}">
           <span class="student-brand-mark ${role}-brand-mark">${icon("icon-eye-logo")}</span>
           <span><strong>EduMind</strong><small>${page.route}</small></span>
         </a>
         <nav class="student-nav ${role}-nav">
-          ${nav.map(([id, glyph, label], index) => html`<a class="${index === 0 ? "active" : ""}" href="#/${role}" data-scroll="${id}">${icon(glyph)} ${label}</a>`).join("")}
+          ${groupedNav(role, nav)}
         </nav>
-        <button class="logout-button student-logout" id="logoutButton" type="button">${icon("icon-log-out")} ${t("common").loginScreen}</button>
+        <div class="mathvision-topbar-right">
+          ${utilityActions(role)}
+          <button class="logout-button student-logout" id="logoutButton" type="button">${icon("icon-log-out")} ${t("common").loginScreen}</button>
+        </div>
       </aside>
   `;
 }
@@ -592,6 +680,7 @@ function renderStudentDashboard() {
     </div>
   `;
   wireLanguage(renderStudentDashboard);
+  wireUtilities(renderStudentDashboard);
   wireDashboard("student");
   wireStudentStudio();
 }
@@ -731,6 +820,7 @@ function renderTeacherDashboard() {
     </div>
   `;
   wireLanguage(renderTeacherDashboard);
+  wireUtilities(renderTeacherDashboard);
   wireDashboard("teacher");
   wireTeacherDashboard();
 }
@@ -804,6 +894,7 @@ function renderParentDashboard() {
     </div>
   `;
   wireLanguage(renderParentDashboard);
+  wireUtilities(renderParentDashboard);
   wireParentDashboard();
 }
 
